@@ -22,6 +22,11 @@ use hal::digital::v2::OutputPin;
 #[cfg(feature = "unproven")]
 use hal::digital::v2::{InputPin, StatefulOutputPin, ToggleableOutputPin};
 
+use embedded_hal_alpha::digital::{
+    InputPin as InputPinAlpha, OutputPin as OutputPinAlpha,
+    StatefulOutputPin as StatefulOutputPinAlpha, ToggleableOutputPin as ToggleableOutputPinAlpha,
+};
+
 pub use crate::gpio::v2::PinMode;
 use crate::gpio::v2::{self, Alternate, AlternateConfig, InputConfig, OutputConfig, PinId};
 
@@ -345,6 +350,21 @@ where
     }
 }
 
+impl<I, M> ToggleableOutputPinAlpha for Pin<I, Output<M>>
+where
+    I: PinId,
+    M: OutputConfig,
+{
+    // TODO: switch to ! when it’s stable
+    type Error = ();
+
+    #[inline]
+    fn try_toggle(&mut self) -> Result<(), Self::Error> {
+        self.pin._toggle();
+        Ok(())
+    }
+}
+
 #[cfg(feature = "unproven")]
 impl<I: PinId> InputPin for Pin<I, Output<ReadableOpenDrain>> {
     // TODO: switch to ! when it’s stable
@@ -357,6 +377,21 @@ impl<I: PinId> InputPin for Pin<I, Output<ReadableOpenDrain>> {
 
     #[inline]
     fn is_low(&self) -> Result<bool, Self::Error> {
+        Ok(self.pin._is_low())
+    }
+}
+
+impl<I: PinId> InputPinAlpha for Pin<I, Output<ReadableOpenDrain>> {
+    // TODO: switch to ! when it’s stable
+    type Error = ();
+
+    #[inline]
+    fn try_is_high(&self) -> Result<bool, Self::Error> {
+        Ok(self.pin._is_high())
+    }
+
+    #[inline]
+    fn try_is_low(&self) -> Result<bool, Self::Error> {
         Ok(self.pin._is_low())
     }
 }
@@ -381,6 +416,25 @@ where
     }
 }
 
+impl<I, M> InputPinAlpha for Pin<I, Input<M>>
+where
+    I: PinId,
+    M: InputConfig,
+{
+    // TODO: switch to ! when it’s stable
+    type Error = ();
+
+    #[inline]
+    fn try_is_high(&self) -> Result<bool, Self::Error> {
+        Ok(self.pin._is_high())
+    }
+
+    #[inline]
+    fn try_is_low(&self) -> Result<bool, Self::Error> {
+        Ok(self.pin._is_low())
+    }
+}
+
 #[cfg(feature = "unproven")]
 impl<I, M> StatefulOutputPin for Pin<I, Output<M>>
 where
@@ -394,6 +448,22 @@ where
 
     #[inline]
     fn is_set_low(&self) -> Result<bool, Self::Error> {
+        Ok(self.pin._is_set_low())
+    }
+}
+
+impl<I, M> StatefulOutputPinAlpha for Pin<I, Output<M>>
+where
+    I: PinId,
+    M: OutputConfig,
+{
+    #[inline]
+    fn try_is_set_high(&self) -> Result<bool, Self::Error> {
+        Ok(self.pin._is_set_high())
+    }
+
+    #[inline]
+    fn try_is_set_low(&self) -> Result<bool, Self::Error> {
         Ok(self.pin._is_set_low())
     }
 }
@@ -414,6 +484,27 @@ where
 
     #[inline]
     fn set_low(&mut self) -> Result<(), Self::Error> {
+        self.pin._set_low();
+        Ok(())
+    }
+}
+
+impl<I, M> OutputPinAlpha for Pin<I, Output<M>>
+where
+    I: PinId,
+    M: OutputConfig,
+{
+    // TODO: switch to ! when it’s stable
+    type Error = ();
+
+    #[inline]
+    fn try_set_high(&mut self) -> Result<(), Self::Error> {
+        self.pin._set_high();
+        Ok(())
+    }
+
+    #[inline]
+    fn try_set_low(&mut self) -> Result<(), Self::Error> {
         self.pin._set_low();
         Ok(())
     }

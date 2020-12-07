@@ -63,6 +63,11 @@ use hal::digital::v2::OutputPin;
 #[cfg(feature = "unproven")]
 use hal::digital::v2::{InputPin, StatefulOutputPin, ToggleableOutputPin};
 
+use embedded_hal_alpha::digital::{
+    InputPin as InputPinAlpha, OutputPin as OutputPinAlpha,
+    StatefulOutputPin as StatefulOutputPinAlpha, ToggleableOutputPin as ToggleableOutputPinAlpha,
+};
+
 use super::pin::*;
 
 /// GPIO error type
@@ -493,6 +498,20 @@ impl OutputPin for DynPin {
     }
 }
 
+impl OutputPinAlpha for DynPin {
+    type Error = Error;
+
+    #[inline]
+    fn try_set_high(&mut self) -> Result<(), Self::Error> {
+        self._set_high()
+    }
+
+    #[inline]
+    fn try_set_low(&mut self) -> Result<(), Self::Error> {
+        self._set_low()
+    }
+}
+
 #[cfg(feature = "unproven")]
 impl InputPin for DynPin {
     type Error = Error;
@@ -506,11 +525,34 @@ impl InputPin for DynPin {
     }
 }
 
+impl InputPinAlpha for DynPin {
+    type Error = Error;
+
+    #[inline]
+    fn try_is_high(&self) -> Result<bool, Self::Error> {
+        self._is_high()
+    }
+
+    #[inline]
+    fn try_is_low(&self) -> Result<bool, Self::Error> {
+        self._is_low()
+    }
+}
+
 #[cfg(feature = "unproven")]
 impl ToggleableOutputPin for DynPin {
     type Error = Error;
     #[inline]
     fn toggle(&mut self) -> Result<(), Self::Error> {
+        self._toggle()
+    }
+}
+
+impl ToggleableOutputPinAlpha for DynPin {
+    type Error = Error;
+
+    #[inline]
+    fn try_toggle(&mut self) -> Result<(), Self::Error> {
         self._toggle()
     }
 }
@@ -523,6 +565,18 @@ impl StatefulOutputPin for DynPin {
     }
     #[inline]
     fn is_set_low(&self) -> Result<bool, Self::Error> {
+        self._is_set_low()
+    }
+}
+
+impl StatefulOutputPinAlpha for DynPin {
+    #[inline]
+    fn try_is_set_high(&self) -> Result<bool, Self::Error> {
+        self._is_set_high()
+    }
+
+    #[inline]
+    fn try_is_set_low(&self) -> Result<bool, Self::Error> {
         self._is_set_low()
     }
 }

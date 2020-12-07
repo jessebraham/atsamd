@@ -144,6 +144,11 @@ use hal::digital::v2::OutputPin;
 #[cfg(feature = "unproven")]
 use hal::digital::v2::{InputPin, StatefulOutputPin, ToggleableOutputPin};
 
+use embedded_hal_alpha::digital::{
+    InputPin as InputPinAlpha, OutputPin as OutputPinAlpha,
+    StatefulOutputPin as StatefulOutputPinAlpha, ToggleableOutputPin as ToggleableOutputPinAlpha,
+};
+
 use crate::target_device::PORT;
 
 use crate::typelevel::{NoneT, Sealed};
@@ -1294,6 +1299,26 @@ where
     }
 }
 
+impl<I, C> OutputPinAlpha for Pin<I, Output<C>>
+where
+    I: PinId,
+    C: OutputConfig,
+{
+    type Error = Infallible;
+
+    #[inline]
+    fn try_set_high(&mut self) -> Result<(), Self::Error> {
+        self._set_high();
+        Ok(())
+    }
+
+    #[inline]
+    fn try_set_low(&mut self) -> Result<(), Self::Error> {
+        self._set_low();
+        Ok(())
+    }
+}
+
 #[cfg(feature = "unproven")]
 impl<I> InputPin for Pin<I, ReadableOutput>
 where
@@ -1306,6 +1331,23 @@ where
     }
     #[inline]
     fn is_low(&self) -> Result<bool, Self::Error> {
+        Ok(self._is_low())
+    }
+}
+
+impl<I> InputPinAlpha for Pin<I, ReadableOutput>
+where
+    I: PinId,
+{
+    type Error = Infallible;
+
+    #[inline]
+    fn try_is_high(&self) -> Result<bool, Self::Error> {
+        Ok(self._is_high())
+    }
+
+    #[inline]
+    fn try_is_low(&self) -> Result<bool, Self::Error> {
         Ok(self._is_low())
     }
 }
@@ -1327,6 +1369,24 @@ where
     }
 }
 
+impl<I, C> InputPinAlpha for Pin<I, Input<C>>
+where
+    I: PinId,
+    C: InputConfig,
+{
+    type Error = Infallible;
+
+    #[inline]
+    fn try_is_high(&self) -> Result<bool, Self::Error> {
+        Ok(self._is_high())
+    }
+
+    #[inline]
+    fn try_is_low(&self) -> Result<bool, Self::Error> {
+        Ok(self._is_low())
+    }
+}
+
 #[cfg(feature = "unproven")]
 impl<I, C> ToggleableOutputPin for Pin<I, Output<C>>
 where
@@ -1336,6 +1396,20 @@ where
     type Error = Infallible;
     #[inline]
     fn toggle(&mut self) -> Result<(), Self::Error> {
+        self._toggle();
+        Ok(())
+    }
+}
+
+impl<I, C> ToggleableOutputPinAlpha for Pin<I, Output<C>>
+where
+    I: PinId,
+    C: OutputConfig,
+{
+    type Error = Infallible;
+
+    #[inline]
+    fn try_toggle(&mut self) -> Result<(), Self::Error> {
         self._toggle();
         Ok(())
     }
@@ -1353,6 +1427,22 @@ where
     }
     #[inline]
     fn is_set_low(&self) -> Result<bool, Self::Error> {
+        Ok(self._is_set_low())
+    }
+}
+
+impl<I, C> StatefulOutputPinAlpha for Pin<I, Output<C>>
+where
+    I: PinId,
+    C: OutputConfig,
+{
+    #[inline]
+    fn try_is_set_high(&self) -> Result<bool, Self::Error> {
+        Ok(self._is_set_high())
+    }
+
+    #[inline]
+    fn try_is_set_low(&self) -> Result<bool, Self::Error> {
         Ok(self._is_set_low())
     }
 }
